@@ -1,7 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ project.title }}</title>
+    <title>{{ project.title }} | My Portfolio</title>
+    <meta name="description" content="{{ project.description|truncatechars:150 }}">
+    <meta property="og:title" content="{{ project.title }}">
+    <meta property="og:description" content="{{ project.description|truncatechars:150 }}">
+    {% if project.images.all %}
+        <meta property="og:image" content="{{ project.images.first.image.url }}">
+    {% endif %}
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="stylesheet"
      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
 </head>
@@ -12,7 +20,57 @@
     <p>{{ project.description }}</p>
 
     {% if project.image %}
-        <img src="{{ project.image.url }}" class="img-fluid mt-3">
+        <img src="{{ project.image }}" class="img-fluid mt-3">
     {% endif %}
+
+    {% if project.images.all %}
+        <div class="row">
+            {% for img in project.images.all %}
+                <div class="col-md-4 mb-3">
+                    <img src="{{ img.image.url }}" class="img-fluid rounded">
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <p>
+        <strong>Likes:</strong> {{ project.likes.count }}
+        {% if user.is_authenticated %}
+            <form action="{% url 'like_project' project.pk %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-success btn-sm">👍 Like</button>
+            </form>
+        {% endif %}
+    </p>
+
+    {% if user.is_staff %}
+        <a href="{% url 'edit_project' project.pk %}" class="btn btn-warning btn-sm">Edit</a>
+        <a href="{% url 'delete_project' project.pk %}" class="btn btn-danger btn-sm">Delete</a>
+    {% endif %}
+
+    <h3>Comments</h3>
+    {% for comment in comments %}
+        <div class="mb-2">
+            <strong>{{ comment.name }}</strong> ({{ comment.created_at|date:"Y-m-d H:i" }}):<br>
+            {{ comment.text }}
+        </div>
+    {% empty %}
+        <p>No comments yet.</p>
+    {% endfor %}
+
+    <form method="post" class="mt-3">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Your name" class="form-control mb-2" required>
+        <textarea name="text" placeholder="Your comment" class="form-control mb-2" required></textarea>
+        <button type="submit" class="btn btn-primary">Add Comment</button>
+    </form>
+
+    <!-- Social Share Buttons -->
+    <div class="mt-3">
+        <h5>Share this project:</h5>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="btn btn-primary btn-sm me-2">Facebook</a>
+        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ project.title }}" target="_blank" class="btn btn-info btn-sm me-2">Twitter</a>
+        <a href="https://wa.me/?text={{ request.build_absolute_uri }}" target="_blank" class="btn btn-success btn-sm">WhatsApp</a>
+    </div>
 </body>
 </html>

@@ -7,10 +7,29 @@
 </head>
 <body class="container mt-5">
     <h1>Contact Me</h1>
-    <form method="post">
+    {% if sent %}
+        <div class="alert alert-success">Your message has been sent!</div>
+    {% endif %}
+    <form id="contactForm" method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        <input type="text" name="name" placeholder="Your name" class="form-control mb-2" required>
+        <input type="email" name="email" placeholder="Your email" class="form-control mb-2" required>
+        <textarea name="message" placeholder="Your message" class="form-control mb-2" required></textarea>
         <button type="submit" class="btn btn-primary">Send</button>
     </form>
+    <div id="contactResult"></div>
+    <script>
+    document.getElementById('contactForm').onsubmit = async function(e) {
+        e.preventDefault();
+        let formData = new FormData(this);
+        let response = await fetch("{% url 'contact' %}", {
+            method: "POST",
+            body: formData,
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        });
+        let result = await response.text();
+        document.getElementById('contactResult').innerHTML = result;
+    };
+    </script>
 </body>
 </html>

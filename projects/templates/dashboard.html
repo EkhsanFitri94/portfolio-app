@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Admin Dashboard</h2>
+<ul>
+    <li>Total Projects: {{ total_projects }}</li>
+    <li>Total Comments: {{ total_comments }}</li>
+    <li>Total Likes: {{ total_likes }}</li>
+</ul>
+<h3>Recent Comments</h3>
+<ul>
+    {% for comment in recent_comments %}
+        <li>
+            <strong>{{ comment.name }}</strong> on <em>{{ comment.project.title }}</em>: {{ comment.text|truncatechars:50 }}
+        </li>
+    {% empty %}
+        <li>No recent comments.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

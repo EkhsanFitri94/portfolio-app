@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<h2 class="mb-4">My Skills</h2>
+<div class="row">
+    {% for skill in skills %}
+    <div class="col-md-6 mb-3">
+        <label class="fw-bold">{{ skill.name }}</label>
+        <div class="progress" style="height: 30px;">
+            <div class="progress-bar bg-info" role="progressbar"
+                 style="width: 0%;" aria-valuenow="{{ skill.percent }}"
+                 aria-valuemin="0" aria-valuemax="100"
+                 data-percent="{{ skill.percent }}">
+                <span class="fw-bold">{{ skill.percent }}%</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<a href="{% static 'resume.pdf' %}" download class="btn btn-outline-primary">
+    <i class="fa fa-download"></i> Download My Resume (PDF)
+</a>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.progress-bar').forEach(function(bar) {
+        let percent = bar.getAttribute('data-percent');
+        setTimeout(function() {
+            bar.style.width = percent + '%';
+        }, 300);
+    });
+});
+</script>
+{% endblock %}
